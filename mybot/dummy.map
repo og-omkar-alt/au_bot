@@ -1,0 +1,5 @@
+ID 0
+TEAM A
+MAP 5 5
+UNIT_LIMIT 4
+# No tiles data needed for compile test
