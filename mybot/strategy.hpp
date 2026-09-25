@@ -26,18 +26,31 @@ inline Direction compute_move(Controller& ct) {
         for (auto const& s : safety) {
             if (s.dir == *pearl_dir && is_fully_safe(s) && !s.headToHeadRisk) {
                 // If there's an open path available (>1000), but the pearl path is closed (<1000)
-                // AND doesn't have enough space to fit our dragon safely, it's a trap.
-                bool is_trap = (max_reachable > 1000 && s.reachableSpace < 1000 && s.reachableSpace < ct.get_length() + 3);
+                // OR if the entire area we're in is too small for our dragon to fit, it's a trap.
+                bool is_trap = (s.reachableSpace < ct.get_length() + 3) && 
+                               (max_reachable > 1000 || s.reachableSpace < max_reachable || max_reachable < ct.get_length() + 3);
+                
                 if (!is_trap) {
                     return *pearl_dir;
                 }
             }
         }
         // Pearl direction is dangerous (head-to-head risk or dead-end trap).
-        // Fall through to safe_move which handles the risk quantitatively.
+        // Fall through...
     }
 
-    // 2. No safe pearl path visible — use scored safe_move with exploration bias.
+    // 2. If we are trapped (no open space > 1000), seek a portal to escape the box!
+    if (max_reachable < 1000) {
+        if (auto portal_dir = bfs_to_nearest_portal(ct)) {
+            for (auto const& s : safety) {
+                if (s.dir == *portal_dir && is_fully_safe(s) && !s.headToHeadRisk) {
+                    return *portal_dir;
+                }
+            }
+        }
+    }
+
+    // 3. No safe path visible — use scored safe_move with exploration bias.
     return safe_move(ct);
 }
 

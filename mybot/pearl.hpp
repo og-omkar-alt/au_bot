@@ -51,3 +51,47 @@ inline std::optional<unswbc::Direction> bfs_to_nearest_pearl(unswbc::Controller&
     }
     return std::nullopt; // no reachable pearl currently visible
 }
+
+// BFS within the current 7x7 vision window to the nearest portal.
+inline std::optional<unswbc::Direction> bfs_to_nearest_portal(unswbc::Controller& ct) {
+    using namespace unswbc;
+
+    Position const start = ct.get_position();
+
+    static std::unordered_map<Position, char, PositionHash> first_step;
+    static std::unordered_map<Position, bool, PositionHash> visited;
+    first_step.clear();
+    visited.clear();
+
+    std::queue<Position> q;
+    q.push(start);
+    visited[start] = true;
+
+    while (!q.empty()) {
+        Position cur = q.front();
+        q.pop();
+
+        Tile const* cur_tile = ct.get_tile(cur);
+        if (!cur_tile) continue;
+
+        for (auto d : Direction::get_direction_list()) {
+            if (!cur_tile->get_edge(d).is_passable()) continue;
+
+            if (cur_tile->get_edge(d).is_portal()) {
+                return (cur == start) ? std::make_optional(d) : std::make_optional(Direction(first_step[cur]));
+            }
+
+            Position nxt = cur.add_dir(d);
+            if (visited.count(nxt)) continue;
+
+            Tile const* nxt_tile = ct.get_tile(nxt);
+            if (!nxt_tile) continue; 
+            if (nxt_tile->get_dragon()) continue; 
+
+            visited[nxt] = true;
+            first_step[nxt] = (cur == start) ? d.value : first_step[cur];
+            q.push(nxt);
+        }
+    }
+    return std::nullopt; 
+}

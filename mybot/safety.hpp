@@ -46,6 +46,12 @@ inline int vision_flood_fill(unswbc::Controller& ct, unswbc::Position start) {
         for (auto d : Direction::get_direction_list()) {
             if (!cur_tile->get_edge(d).is_passable()) continue;
 
+            if (cur_tile->get_edge(d).is_portal()) {
+                // A portal leads to an unknown area, effectively an open path/escape route.
+                reached_edge = true;
+                continue;
+            }
+
             Position nxt = cur.add_dir(d);
             if (visited.count(nxt)) continue;
 
