@@ -8,9 +8,9 @@ int main()
     while (unswbc::update(ct, game))
     {
         // Redundancy and size-management: Split into multiple dragons to cover more map.
-        // If a dragon gets too long (e.g. > 10), it becomes harder to maneuver.
-        if (ct.get_length() > 10 && ct.can_split(4)) {
-            ct.do_split(4);
+        // Increase the split threshold so we don't lose the 'longest dragon' tiebreaker.
+        if (ct.get_length() > 40 && ct.can_split(10)) {
+            ct.do_split(10);
         } else {
             auto dir = unswbc::compute_move(ct);
             ct.make_move(dir);
