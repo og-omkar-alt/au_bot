@@ -11,8 +11,8 @@ int main()
         // Increase the split threshold so we don't lose the 'longest dragon' tiebreaker.
         // However, if we are in an enclosed space (max_space < 1000) and we are about to outgrow it, split!
         int max_space = 0;
-        for (auto const& s : unswbc::compute_safety(ct)) {
-            if (unswbc::is_fully_safe(s) && s.reachableSpace > max_space) {
+        for (auto const& s : compute_safety(ct)) {
+            if (is_fully_safe(s) && s.reachableSpace > max_space) {
                 max_space = s.reachableSpace;
             }
         }
