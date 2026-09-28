@@ -19,8 +19,8 @@ int main()
         
         bool emergency_split = (max_space < 1000 && max_space > 0 && ct.get_length() > max_space - 4);
 
-        if ((ct.get_length() > 40 || emergency_split) && ct.can_split(4)) {
-            int split_size = emergency_split ? 4 : 10;
+        int split_size = emergency_split ? 4 : 10;
+        if ((ct.get_length() > 40 || emergency_split) && ct.can_split(split_size)) {
             ct.do_split(split_size);
         } else {
             auto dir = unswbc::compute_move(ct);
